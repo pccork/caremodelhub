@@ -8,7 +8,7 @@
 
 import Hapi from "@hapi/hapi";
 import dotenv from "dotenv";
-
+import { connectDb } from "./models/db.js";
 // Load variables from .env into process.env
 dotenv.config();
 
@@ -16,6 +16,7 @@ dotenv.config();
  * Create and start the server
  */
 async function startServer() {
+
   // Create a Hapi server instance
   const server = Hapi.server({
     port: Number(process.env.PORT) || 4000,
@@ -26,6 +27,8 @@ async function startServer() {
       },
     },
   });
+  // Connect to database
+  connectDb("mongo");
 
   /**
    * Basic health check route
