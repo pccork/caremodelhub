@@ -1,0 +1,54 @@
+{
+  "compilerOptions": {
+    /* ===============================
+       FILE STRUCTURE
+       =============================== */
+
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    /* ===============================
+       MODULE & TARGET (Node 20)
+       =============================== */
+
+    "module": "nodenext",
+    "target": "esnext",
+    "moduleResolution": "nodenext",
+
+    /* ===============================
+       ENVIRONMENT TYPES
+       =============================== */
+
+    "types": ["node"],
+
+    /* ===============================
+       RUNTIME & DEBUGGING
+       =============================== */
+
+    "sourceMap": true,
+
+    /* ===============================
+       STRICTNESS (KEEP THESE)
+       =============================== */
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    /* ===============================
+       MODULE SAFETY
+       =============================== */
+
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+
+    /* ===============================
+       QUALITY OF LIFE
+       =============================== */
+
+    "skipLibCheck": true
+  },
+
+  "include": ["src/**/*"]
+}
