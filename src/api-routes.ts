@@ -1,16 +1,15 @@
 import { usersApi } from "./api/users-api.js";
 import type { ServerRoute } from "@hapi/hapi";
+import { resultsApi } from "./api/results-api.js";
+
 
 export const apiRoutes: ServerRoute[] = [
   {
-    method: "POST",
-    path: "/api/users/login",
-    ...usersApi.login,
+    method: "POST",path: "/api/users/login",...usersApi.login,
   },
 
   {
-    method: "GET",
-    path: "/api/me",
+    method: "GET",path: "/api/me",
     options: {
       auth: {
         scope: ["user", "scientist", "admin"],
@@ -25,22 +24,21 @@ export const apiRoutes: ServerRoute[] = [
      USER MANAGEMENT
      ===============*/
   {
-    method: "GET",
-    path: "/api/users",
-    ...usersApi.listUsers,
+    method: "GET",path: "/api/users",...usersApi.listUsers,
   },
 
   {
-    method: "POST",
-    path: "/api/users",
-    ...usersApi.createUser,
+    method: "POST",path: "/api/users",...usersApi.createUser,
   },
 
   {
-    method: "DELETE",
-    path: "/api/users/{id}",
-    ...usersApi.deleteUser,
+    method: "DELETE",path: "/api/users/{id}",...usersApi.deleteUser,
   },
+
+  // Results
+  { method: "POST", path: "/api/results", ...resultsApi.create },
+  { method: "GET", path: "/api/results", ...resultsApi.list },
+  { method: "DELETE", path: "/api/results/{id}", ...resultsApi.delete },
   
 ];
 console.log(usersApi.login);

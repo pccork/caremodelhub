@@ -3,11 +3,13 @@
  * This allows swap MongoDB later between local and online*/
 import { connectMongo } from "./mongo/connect.js";
 import type { userStore } from "./mongo/user-store.js";
+import type { resultStore } from "./mongo/result-store.js";
+
 
 export type Db = {
   // Stores will be attached here later
   userStore: typeof userStore | null;
-  resultStore: any;
+  resultStore: typeof resultStore | null;
 };
 
 // Singleton DB object
