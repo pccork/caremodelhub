@@ -4,18 +4,21 @@
 import { connectMongo } from "./mongo/connect.js";
 import type { userStore } from "./mongo/user-store.js";
 import type { resultStore } from "./mongo/result-store.js";
+import type { auditStore } from "./mongo/audit-store.js";
 
 
 export type Db = {
   // Stores will be attached here later
   userStore: typeof userStore | null;
   resultStore: typeof resultStore | null;
+  auditStore: typeof auditStore | null;
 };
 
 // Singleton DB object
 export const db: Db = {
   userStore: null,
   resultStore: null,
+  auditStore: null,
 };
 
 /**

@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import type { Db } from "../db.js";
 import { userStore } from "./user-store.js";
 import { resultStore } from "./result-store.js";
+import { auditStore } from "./audit-store.js";
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ export async function connectMongo(db: Db) {
     // Attach stores
     db.userStore = userStore;
     db.resultStore = resultStore;
+    db.auditStore = auditStore;
 
     console.log("MongoDB connected");
     console.log(`Database: ${mongoose.connection.name}`);

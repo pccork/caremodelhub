@@ -5,6 +5,7 @@ import { db } from "../models/db.js";
 import { capabilities } from "../auth/capabilities.js";
 import { hasCapability } from "../auth/authorise.js";
 import { calculateKfre } from "../services/kfre-client.js";
+import crypto from "crypto";
 
 export const resultsApi: {
   create: Pick<ServerRoute, "options" | "handler">;
@@ -62,6 +63,33 @@ export const resultsApi: {
         model: kfreResult.model,
         modelVersion: kfreResult.model_version,
       });
+      if (!result) {
+        throw Boom.internal("Result persistence failed");
+      }
+
+    /* ===================
+     AUDIT RECORD (NEW)
+     ======================*/
+  const inputsHash = crypto
+    .createHash("sha256")
+    .update(JSON.stringify(inputs))
+    .digest("hex");
+
+  await db.auditStore?.record({
+    actorId: userId,
+    actorRole: role,
+    action: "CALCULATE_RESULT",
+    targetType: "RESULT",
+    targetId: result._id.toString(),
+    mrn,
+    specimenNo,
+    model: kfreResult.model,
+    modelVersion: kfreResult.model_version,
+    requestId: kfreResult.request_id,
+    inputsHash,
+    summary: "KFRE 5-year risk calculated",
+    source: "api",
+  });
 
       return h.response(result).code(201);
     },
