@@ -5,7 +5,7 @@ import { db } from "../models/db.js";
 import type { ServerRoute } from "@hapi/hapi";
 import type { Role } from "../types/user-types.js";
 
-
+// Ref: GitHub: https://github.com/dwyl/hapi-auth-jwt2, GitHub: https://github.com/sandrinodimattia/hapi-api-starter
 export const usersApi: {
   login: Pick<ServerRoute, "options" | "handler">;
   listUsers: Pick<ServerRoute, "options" | "handler">;

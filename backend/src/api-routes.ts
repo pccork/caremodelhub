@@ -2,7 +2,8 @@ import { usersApi } from "./api/users-api.js";
 import type { ServerRoute } from "@hapi/hapi";
 import { resultsApi } from "./api/results-api.js";
 
-
+// REF: https://github.com/hapijs/hapi/blob/master/examples/authentication/jwt.js
+// This file binf RBAC to URLs
 export const apiRoutes: ServerRoute[] = [
   {
     method: "POST",path: "/api/users/login",...usersApi.login,
@@ -15,14 +16,13 @@ export const apiRoutes: ServerRoute[] = [
         scope: ["user", "scientist", "admin"],
       },
     },
+    // JWT payload and validation from ./jwt-utils.ts
     handler: (request: any) => ({
       userId: request.auth.credentials.userId,
       role: request.auth.credentials.role,
     }),
   },
-  /* ===============
-     USER MANAGEMENT
-     ===============*/
+  /* User mangement endpoint after RBAC enforcement and handler execution*/
   {
     method: "GET",path: "/api/users",...usersApi.listUsers,
   },

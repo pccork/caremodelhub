@@ -5,10 +5,10 @@ Calibrated to a non–North American population
 Risk = 1 - 0.9365 ^ exp(βsum)
 
 βsum =
--0.2201 × (age/10 − 7.036)
-+ 0.2467 × (male − 0.5642)
-− 0.5567 × (eGFR/5 − 7.222)
-+ 0.4510 × (ln(ACR) − 5.137)
+-0.2201 x (age/10 - 7.036)
++ 0.2467 x (male - 0.5642)
+- 0.5567 x (eGFR/5 - 7.222)
++ 0.4510 x (ln(ACR) - 5.137)
 
 male = 1 if male, 0 if female
 """
