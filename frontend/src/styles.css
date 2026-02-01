@@ -1,0 +1,53 @@
+/* ===============================
+   CareModel Hub – UI Bulma Overrides
+   =============================== */
+
+/* 1. Hospital brand palette */
+:root {
+  --cmh-primary: #005eb8;   /* HSE-style blue */
+  --cmh-secondary: #00a3a1;
+  --cmh-accent: #e87722;
+}
+
+/* 2. Override Bulma primary colour */
+.button.is-primary {
+  background-color: var(--cmh-primary);
+  border-color: var(--cmh-primary);
+}
+
+/* 3. Typography for clinical readability */
+body {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 4. Tables – denser clinical layout */
+.table td,
+.table th {
+  padding: 0.5em 0.75em;
+}
+
+/* 5. Print styles for reports */
+@media print {
+  body {
+    font-size: 12pt;
+    color: #000;
+    background: #fff;
+  }
+
+  nav,
+  .button,
+  .notification {
+    display: none !important;
+  }
+
+  .table {
+    page-break-inside: avoid;
+  }
+}
+
+/* 6. Citrix / VDI scaling safety */
+html {
+  zoom: 2;
+}
