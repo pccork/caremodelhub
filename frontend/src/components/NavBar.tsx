@@ -31,7 +31,7 @@ export default function NavBar() {
           <div className="navbar-item">
             {token ? (
               <>
-                <span className="mr-2">Role: <strong>{role}</strong></span>
+                <span className="mr-2">Role: <strong style={{ color: "#000" }}>{role}</strong></span>
                 <button className="button" onClick={doLogout}>Log out</button>
               </>
             ) : (

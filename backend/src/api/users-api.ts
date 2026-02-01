@@ -5,6 +5,20 @@ import { db } from "../models/db.js";
 import type { ServerRoute } from "@hapi/hapi";
 import type { Role } from "../types/user-types.js";
 
+const passwordSchema = Joi.string()
+  .min(8)
+  .pattern(/[A-Z]/, "uppercase letter")
+  .pattern(/[a-z]/, "lowercase letter")
+  .pattern(/[0-9]/, "number")
+  .pattern(/[^A-Za-z0-9]/, "special character")
+  .required()
+  .messages({
+    "string.min": "Password must be at least 8 characters long",
+    "string.pattern.name": "Password must include at least one {#name}",
+    "any.required": "Password is required",
+  });
+  
+
 // Ref: GitHub: https://github.com/dwyl/hapi-auth-jwt2, GitHub: https://github.com/sandrinodimattia/hapi-api-starter
 export const usersApi: {
   login: Pick<ServerRoute, "options" | "handler">;
@@ -13,18 +27,16 @@ export const usersApi: {
   deleteUser: Pick<ServerRoute, "options" | "handler">;
 } = {
   
-  
   login: {
     options: {
       auth: false,
       validate: {
-        payload: Joi.object({
-          
+        payload: Joi.object({       
           // Joi apply strick public-TLD validation
           email: Joi.string().email().required(),
           // In Dev allow internal domain for testing and revert in deployment
           // email: Joi.string().email({ tlds: { allow: false } }).required(),
-          password: Joi.string().min(8).required(),
+          password: passwordSchema,
         }).required(),
 
       failAction: (request, h, err) => {
