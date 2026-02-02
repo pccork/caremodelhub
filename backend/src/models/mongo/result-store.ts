@@ -26,4 +26,16 @@ export const resultStore = {
   async deleteById(id: string) {
     return ResultMongoose.findByIdAndDelete(id);
   },
+
+  async search({ mrn, specimenNo }: { mrn?: string; specimenNo?: string }) {
+  const q: any = {};
+  if (mrn) q.mrn = mrn;
+  if (specimenNo) q.specimenNo = specimenNo;
+
+  return ResultMongoose.find(q)
+    .sort({ createdAt: -1 })
+    .lean();
+},
+
+
 };

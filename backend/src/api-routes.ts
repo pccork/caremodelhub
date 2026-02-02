@@ -1,6 +1,7 @@
 import { usersApi } from "./api/users-api.js";
 import type { ServerRoute } from "@hapi/hapi";
 import { resultsApi } from "./api/results-api.js";
+import { auditApi } from "./api/audit-api.js";
 
 // REF: https://github.com/hapijs/hapi/blob/master/examples/authentication/jwt.js
 // This file binf RBAC to URLs
@@ -39,6 +40,9 @@ export const apiRoutes: ServerRoute[] = [
   { method: "POST", path: "/api/results", ...resultsApi.create },
   { method: "GET", path: "/api/results", ...resultsApi.list },
   { method: "DELETE", path: "/api/results/{id}", ...resultsApi.delete },
+
+  // Audit
+  { method: "GET", path: "/api/audit", ...auditApi,},
   
 ];
 console.log(usersApi.login);

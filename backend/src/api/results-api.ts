@@ -85,8 +85,7 @@ export const resultsApi: {
     specimenNo,
     model: kfreResult.model,
     modelVersion: kfreResult.model_version,
-    requestId: kfreResult.request_id,
-    inputsHash,
+    requestId: kfreResult.request_id,inputsHash,
     summary: "KFRE 5-year risk calculated",
     source: "api",
   });
@@ -96,27 +95,66 @@ export const resultsApi: {
   },
 
   /* ===============================
-     LIST RESULTS (RBAC)
+     LIST / SEARCH RESULTS (RBAC + AUDIT)
      =============================== */
   list: {
     options: {
       auth: { scope: ["user", "scientist", "admin"] },
+      validate: {
+        query: Joi.object({
+          mrn: Joi.string().trim().max(32).optional(),
+          specimenNo: Joi.string().trim().max(32).optional(),
+        }),
+      },
     },
 
     handler: async (request: any) => {
       const { role, userId } = request.auth.credentials;
+      const { mrn, specimenNo } = request.query;
 
-      if (hasCapability(role, capabilities.RESULTS_READ_ALL)) {
-        return db.resultStore?.findAll();
-      }
 
-      if (hasCapability(role, capabilities.RESULTS_READ_OWN)) {
-        return db.resultStore?.findByUser(userId);
-      }
+      // All clinicians can search all patients
+      if (!hasCapability(role, capabilities.RESULTS_READ_ALL) &&
+        !hasCapability(role, capabilities.RESULTS_READ_OWN)) {
+      throw Boom.forbidden();
+    }
 
-      throw Boom.forbidden("Not allowed to view results");
+    let results;
+
+    if (mrn || specimenNo) {
+      // SEARCH (intentful)
+      results = await db.resultStore?.search({
+        mrn,
+        specimenNo,
+      });
+
+      // ======================
+      // AUDIT SEARCH INTENT
+      // ======================
+      await db.auditStore?.record({
+        actorId: userId,
+        actorRole: role,
+        action: "SEARCH_RESULTS",
+        targetType: "RESULT",
+        mrn,
+        specimenNo,
+        summary: "Clinical search of KFRE results",
+        source: "api",
+      });
+
+
+     } else {
+      // LIST ALL (dashboard)
+      results = hasCapability(role, capabilities.RESULTS_READ_ALL)
+        ? await db.resultStore?.findAll()
+        : await db.resultStore?.findByUser(userId);
+    }
+
+    return results;
     },
   },
+
+  
 
   /* ===============================
      DELETE RESULT (admin)

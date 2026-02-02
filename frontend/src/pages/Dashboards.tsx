@@ -4,6 +4,9 @@ import api from "../api/api";
 export default function Dashboard() {
   const [rows, setRows] = useState<any[]>([]);
   const [err, setErr] = useState<string | null>(null);
+  const [mrn, setMrn] = useState("");
+  const [specimenNo, setSpecimenNo] = useState("");
+  
 
   useEffect(() => {
     api.get("/api/results")
@@ -11,9 +14,52 @@ export default function Dashboard() {
       .catch((e) => setErr(e?.response?.data?.message || "Failed to load results"));
   }, []);
 
+  const search = async () => {
+    setErr(null);
+    try {
+      const r = await api.get("/api/results", {
+        params: {
+          mrn: mrn || undefined,
+          specimenNo: specimenNo || undefined,
+        },
+      });
+      setRows(r.data);
+    } catch (e: any) {
+      setErr(e?.response?.data?.message || "Search failed");
+    }
+  };
+
   return (
     <div className="section">
       <h1 className="title">Results</h1>
+      {/* Search box */}
+      <div className="box">
+        <div className="columns">
+          <div className="column">
+            <input
+              className="input"
+              placeholder="MRN"
+              value={mrn}
+              onChange={(e) => setMrn(e.target.value)}
+            />
+          </div>
+
+          <div className="column">
+            <input
+              className="input"
+              placeholder="Specimen No"
+              value={specimenNo}
+              onChange={(e) => setSpecimenNo(e.target.value)}
+            />
+          </div>
+
+          <div className="column is-narrow">
+            <button className="button is-link" onClick={search}>
+              Search
+            </button>
+          </div>
+        </div>
+      </div>
       {err && <div className="notification is-danger">{err}</div>}
 
       <table className="table is-fullwidth is-striped is-hoverable">
