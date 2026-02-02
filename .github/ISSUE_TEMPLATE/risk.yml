@@ -1,0 +1,35 @@
+name: Risk Register Item
+description: Create a risk entry for CMH
+title: "RISK: <short title>"
+labels: ["risk", "status:open"]
+body:
+  - type: input
+    id: risk_id
+    attributes:
+      label: Risk ID
+      placeholder: RISK-###
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options: ["low", "medium", "high"]
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+  - type: textarea
+    id: mitigation
+    attributes:
+      label: Mitigation
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence links
+  - type: textarea
+    id: owner
+    attributes:
+      label: Owner / reviewer role
