@@ -1,0 +1,131 @@
+name: CMH Evidence Pack
+
+on:
+  push:
+    tags:
+      - "cmh-*"
+
+jobs:
+  build-and-evidence:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---------- BACKEND ----------
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Backend tests
+        working-directory: backend
+        run: npm test > ../evidence/backend-test.txt
+
+      - name: npm audit
+        working-directory: backend
+        run: npm audit --json > ../evidence/backend-audit.json || true
+
+      # ---------- PYTHON MODEL ----------
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install KFRE deps
+        working-directory: kfre_service
+        run: pip install -r requirements.txt
+
+      - name: Run KFRE tests
+        working-directory: kfre_service
+        run: pytest > ../evidence/pytest.txt
+
+      - name: Record model version
+        run: |
+          mkdir -p evidence
+          echo '{ "model":"KFRE", "version":"4-variable-5y", "commit":"'"$GITHUB_SHA"'" }' > evidence/model-version.json
+
+      # ---------- FRONTEND ----------
+      - name: Install frontend
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      # ---------- SECURITY ----------
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: fs
+          output: evidence/trivy.txt
+
+      # ---------- SBOM ----------
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          output-file: evidence/sbom.json
+
+      # ---------- GOVERNANCE ----------
+      - name: Capture PRs
+        run: |
+          gh pr list --state merged > evidence/pull-requests.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------- MANIFEST ----------
+      - name: Build manifest
+        run: |
+          echo "{ \"commit\": \"$GITHUB_SHA\", \"tag\": \"$GITHUB_REF_NAME\" }" > evidence/manifest.json
+      # ---------- MODEL CARD ----------
+      - name: Create filled model card
+        run: |
+          mkdir -p evidence/model
+          MODEL_VERSION=$(cat kfre_service/app/MODEL_VERSION.txt || echo "kfre-4v-5y-dev")
+          EVID="${GITHUB_REF_NAME}-${GITHUB_SHA}"
+          cp docs/model-cards/KFRE_4v_5y.md evidence/model/KFRE_model_card.md
+          sed -i "s/__MODEL_VERSION__/${MODEL_VERSION}/g" evidence/model/KFRE_model_card.md
+          sed -i "s/__GIT_SHA__/${GITHUB_SHA}/g" evidence/model/KFRE_model_card.md
+          sed -i "s/__EVIDENCE_ID__/${EVID}/g" evidence/model/KFRE_model_card.md
+
+      # ---------- VALIDATION ----------
+      - name: Create validation summary
+        run: |
+          mkdir -p evidence/validation
+          echo "KFRE validation summary" > evidence/validation/KFRE_validation.txt
+          echo "pytest results: see evidence/pytest.txt" >> evidence/validation/KFRE_validation.txt
+
+      # ---------- RISKS ----------
+      - name: Export risk register
+        run: |
+          mkdir -p evidence/risk
+          gh issue list --label risk --state open > evidence/risk/open-risks.txt
+          gh issue list --label risk --state closed > evidence/risk/closed-risks.txt
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------- COMPLIANCE ----------
+      - name: Include compliance docs
+        run: |
+          mkdir -p evidence/compliance
+          cp -r docs/compliance/* evidence/compliance/
+
+      # ---------- ZIP ----------
+      - name: Zip evidence
+        run: zip -r cmh-evidence.zip evidence
+
+      - name: Upload Evidence
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cmh-evidence.zip
