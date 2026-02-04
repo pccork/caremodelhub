@@ -30,7 +30,9 @@ jobs:
 
       - name: Backend tests
         working-directory: backend
-        run: npm test > ../evidence/backend-test.txt
+        run: |
+          mkdir -p ../evidence
+          npm test > ../evidence/backend-test.txt
 
       - name: npm audit
         working-directory: backend
