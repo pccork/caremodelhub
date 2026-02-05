@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "test": "echo \"No backend tests defined yet\" && exit 0"
   },
   "dependencies": {
     "@hapi/hapi": "^21.4.4",
@@ -26,4 +27,6 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
+  
+
 }
