@@ -13,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "axios": "^1.13.4",
     "bulma": "^1.0.4",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
