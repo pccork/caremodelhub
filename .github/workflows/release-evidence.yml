@@ -8,15 +8,22 @@ on:
 jobs:
   build-and-evidence:
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        shell: bash
 
     services:
       mongo:
         image: mongo:7
-        ports:
-          - 27017:27017
+        
 
     steps:
       - uses: actions/checkout@v4
+
+      # ---------- PREP ----------
+      - name: Prepare evidence directory
+        run: mkdir -p "$GITHUB_WORKSPACE/evidence"
 
       # ---------- BACKEND ----------
       - name: Setup Node
@@ -30,13 +37,17 @@ jobs:
 
       - name: Backend tests
         working-directory: backend
+        env:
+          MONGO_URI: mongodb://mongo:27017/caremodelhub
+          JWT_SECRET: super-secret-dev-key-change-me
+          PORT: 4000
         run: |
-          mkdir -p ../evidence
-          npm test > ../evidence/backend-test.txt
+          set -o pipefail
+          npm test > "$GITHUB_WORKSPACE/evidence/backend-test.txt"
 
       - name: npm audit
         working-directory: backend
-        run: npm audit --json > ../evidence/backend-audit.json || true
+        run: npm audit --json > "$GITHUB_WORKSPACE/evidence/backend-audit.json" || true
 
       # ---------- PYTHON MODEL ----------
       - name: Setup Python
@@ -50,7 +61,7 @@ jobs:
 
       - name: Run KFRE tests
         working-directory: kfre_service
-        run: pytest > ../evidence/pytest.txt
+        run: pytest > "$GITHUB_WORKSPACE/evidence/pytest.txt"
 
       - name: Record model version
         run: |
