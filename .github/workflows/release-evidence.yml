@@ -5,6 +5,9 @@ on:
     tags:
       - "cmh-*"
 
+permissions:
+  contents: write
+
 jobs:
   build-and-evidence:
     runs-on: ubuntu-latest
