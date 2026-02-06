@@ -23,3 +23,10 @@ export function RequireRole({
   if (!role || !allow.includes(role)) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
 }
+
+export function RequireDisclaimer({ children }: { children: React.ReactNode }) {
+  const { disclaimerAccepted, ready } = useAuth();
+  if (!ready) return null;
+  if (!disclaimerAccepted) return <Navigate to="/disclaimer" replace />;
+  return <>{children}</>;
+}
