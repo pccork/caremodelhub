@@ -26,12 +26,12 @@ async function startServer() {
     host: "0.0.0.0",
     routes: {
       cors: {
-        origin: ["*"], // allow all origins for now (lock down later)
+        origin: ["*"], // enable CORS handling of any origin allow browsers from any website to call this backend **(lock down later)** in production aws
       },
     },
   });
   // Connect to database
-  connectDb("mongo");
+  await connectDb("mongo");
   await server.start();
 
   console.log(`Server running on ${server.info.uri}`);
