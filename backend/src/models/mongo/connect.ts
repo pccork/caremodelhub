@@ -44,5 +44,12 @@ export async function connectMongo(db: Db) {
 
   mongoose.connection.on("disconnected", () => {
     console.warn(" MongoDB disconnected");
-  });
+  })
+
+  if (uri.startsWith("mongodb://127.0.0.1")) {
+    console.log("Using local MongoDB");
+  } else if (uri.startsWith("mongodb+srv://")) {
+    console.log("Using MongoDB Atlas");
+  };
+
 }

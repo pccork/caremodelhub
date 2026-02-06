@@ -32,6 +32,10 @@ async function startServer() {
   });
   // Connect to database
   connectDb("mongo");
+  await server.start();
+
+  console.log(`Server running on ${server.info.uri}`);
+
 
   /* ===============================
      AUTHENTICATION (JWT)
