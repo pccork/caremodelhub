@@ -2,10 +2,12 @@
 
 import axios from "axios";
 
-const KFRE_BASE_URL = process.env.KFRE_SERVICE_URL;
-
-if (!KFRE_BASE_URL) {
-  throw new Error("KFRE_SERVICE_URL not set");
+function getKfreBaseUrl(): string {
+  const url = process.env.KFRE_SERVICE_URL;
+  if (!url) {
+    throw new Error("KFRE_SERVICE_URL not set");
+  }
+  return url;
 }
 
 export type KfreRequest = {
@@ -26,6 +28,8 @@ export type KfreResponse = {
 export async function calculateKfre(
   input: KfreRequest
 ): Promise<KfreResponse> {
+  const KFRE_BASE_URL = getKfreBaseUrl();
+
   try {
     const response = await axios.post<KfreResponse>(
       `${KFRE_BASE_URL}/calculate`,
