@@ -8,14 +8,13 @@
 
 import Hapi from "@hapi/hapi";
 import Jwt from "@hapi/jwt";
-import dotenv from "dotenv";
+
 
 import { validateJwt } from "./api/jwt-utils.js";
 import { connectDb } from "./models/db.js";
 import { apiRoutes } from "./api-routes.js";
 
-// Load variables from .env into process.env
-dotenv.config();
+
 
 /**
  * Create and start the server
