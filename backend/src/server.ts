@@ -8,10 +8,12 @@
 
 import Hapi from "@hapi/hapi";
 import Jwt from "@hapi/jwt";
-import { validateJwt } from "./api/jwt-utils.js";
 import dotenv from "dotenv";
+
+import { validateJwt } from "./api/jwt-utils.js";
 import { connectDb } from "./models/db.js";
 import { apiRoutes } from "./api-routes.js";
+
 // Load variables from .env into process.env
 dotenv.config();
 
@@ -19,76 +21,66 @@ dotenv.config();
  * Create and start the server
  */
 async function startServer() {
-
   // Create a Hapi server instance
   const server = Hapi.server({
     port: Number(process.env.PORT) || 4000,
     host: "0.0.0.0",
     routes: {
       cors: {
-        origin: ["*"], // enable CORS handling of any origin allow browsers from any website to call this backend **(lock down later)** in production aws
+        origin: ["*"], // TODO: lock down in production
       },
     },
   });
-  // Connect to database
-  await connectDb("mongo");
-  await server.start();
 
-  console.log(`Server running on ${server.info.uri}`);
+  // Register plugins FIRST
+  await server.register(Jwt);
 
-
-  /* ===============================
-     AUTHENTICATION (JWT)
-     =============================== */
-  await server.register(Jwt); // register JWT with hapi/jwt plugin
-  // Set up a reusable authentication strategies name jwt 
+  // Configure authentication AFTER plugin registration
   server.auth.strategy("jwt", "jwt", {
-    keys: process.env.JWT_SECRET,
+    keys: process.env.JWT_SECRET!,
     verify: {
       aud: false,
       iss: false,
       sub: false,
+      nbf: true,
       exp: true,
     },
     validate: validateJwt,
   });
 
-  // JWT is required by default for all routes
+  // JWT required by default
   server.auth.default("jwt");
 
-  
-  
-  /**
-   * Basic health check route
-   * Verify the server is running
-   */
+  // Health check route (no auth)
   server.route({
     method: "GET",
     path: "/health",
-    options: {
-      auth: false, // no auth required
-    },
-   handler: async () => ({
+    options: { auth: false },
+    handler: async () => ({
       status: "ok",
       service: "caremodelhub-backend",
       timestamp: new Date().toISOString(),
     }),
-    
   });
-  server.route(apiRoutes);
-  // Start the server
-  await server.start();
 
-  console.log(` Server running at: ${server.info.uri}`);
+  // API routes
+  server.route(apiRoutes);
+
+  // Connect to database
+  await connectDb("mongo");
+
+  // Start server LAST
+  await server.start();
+  console.log(`Server running on ${server.info.uri}`);
 }
 
 /**
- * Catch startup errors
+ * Global startup error handling
  */
 process.on("unhandledRejection", (err) => {
-  console.error(" Unhandled error:", err);
+  console.error("Unhandled startup error:", err);
   process.exit(1);
 });
 
-// Start the application
+// Start application
 startServer();
