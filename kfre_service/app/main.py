@@ -1,8 +1,8 @@
 import uuid
 from fastapi import FastAPI, Header, HTTPException
-from .schemas import KFREInput, KFREOutput
-from .kfre import calculate_kfre_5y, MODEL_NAME, MODEL_VERSION
-from .audit import audit
+from app.schemas import KFREInput, KFREOutput
+from app.kfre import calculate_kfre_5y, MODEL_NAME, MODEL_VERSION
+from app.audit import audit
 
 app = FastAPI(
     title="CareModelHub KFRE Service",
