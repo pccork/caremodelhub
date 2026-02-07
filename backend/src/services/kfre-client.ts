@@ -2,7 +2,7 @@
 
 import axios from "axios";
 
-const KFRE_BASE_URL = process.env.KFRE_SERVICE_URL || "http://localhost:8000";
+const KFRE_BASE_URL = process.env.KFRE_SERVICE_URL;
 
 if (!KFRE_BASE_URL) {
   throw new Error("KFRE_SERVICE_URL not set");
