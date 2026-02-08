@@ -1,0 +1,43 @@
+name: CMH PR Checks
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # ---- Backend (Node.js) ----
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install backend deps
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: backend
+        run: npm test
+
+      # ---- KFRE Model (Python) ----
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install KFRE deps
+        working-directory: kfre_service
+        run: pip install -r requirements.txt
+
+      - name: Run KFRE tests
+        working-directory: kfre_service
+        run: pytest
