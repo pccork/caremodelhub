@@ -21,12 +21,16 @@ import { apiRoutes } from "./api-routes.js";
  */
 async function startServer() {
   // Create a Hapi server instance
+  const corsOrigins =
+  process.env.CORS_ORIGIN?.split(",").map(o => o.trim()) ?? [];
+
   const server = Hapi.server({
     port: Number(process.env.PORT) || 4000,
     host: "0.0.0.0",
     routes: {
       cors: {
-        origin: ["*"], // TODO: lock down in production
+        origin: corsOrigins.length > 0 ? corsOrigins : ["*"],
+        credentials: true,
       },
     },
   });
