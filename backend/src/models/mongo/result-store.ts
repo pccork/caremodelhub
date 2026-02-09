@@ -15,6 +15,20 @@ export const resultStore = {
     return ResultMongoose.create(data);
   },
 
+  async existsRecent(mrn: string, specimenNo: string, months = 3) {
+    const since = new Date();
+    since.setMonth(since.getMonth() - months);
+
+    const count = await ResultMongoose.countDocuments({
+      mrn,
+      specimenNo,
+      createdAt: { $gte: since },
+    });
+
+    return count > 0;
+  },
+
+
   async findByUser(userId: string) {
     return ResultMongoose.find({ userId }).sort({ createdAt: -1 }).lean();
   },
