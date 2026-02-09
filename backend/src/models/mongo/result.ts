@@ -50,4 +50,21 @@ const resultSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+/* ===============================
+   SUPPORTING INDEXES (NEW)
+   =============================== */
+
+/**
+ * Speed up “same specimen recently” checks
+ * Used by existsRecent(mrn, specimenNo, months)
+ */
+resultSchema.index({ specimenNo: 1, createdAt: -1 });
+
+/**
+ * Speed up MRN + specimen + time-window queries
+ * Clinical duplicate-prevention logic
+ */
+resultSchema.index({ mrn: 1, specimenNo: 1, createdAt: -1 });
+
+
 export const ResultMongoose = mongoose.model("Result", resultSchema);
