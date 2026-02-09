@@ -26,9 +26,12 @@ export const resultsApi: {
             .required(),
 
           specimenNo: Joi.string()
-            .trim()
-            .max(32)
-            .required(),
+            .pattern(/^BC\d{6}$/)
+            .required()
+            .messages({
+              "string.pattern.base":
+                "Specimen number must be in format BC###### (e.g. BC000123)",
+            }),
 
           inputs: Joi.object({
             age: Joi.number().integer().min(18).max(110).required(),
@@ -48,6 +51,34 @@ export const resultsApi: {
       }
 
       const { mrn, specimenNo, inputs } = request.payload;
+
+      /* ===============================
+     DUPLICATE PREVENTION (NEW)
+     =============================== */
+      const recentExists = await db.resultStore?.existsRecent(
+        mrn,
+        specimenNo,
+        3
+      );
+
+      if (recentExists) {
+        throw Boom.conflict(
+          "This MRN and specimen number has already been processed within the last 3 months"
+        );
+      }
+      
+      // Create an audit trail when a duplicate is blocked
+      await db.auditStore?.record({
+        actorId: userId,
+        actorRole: role,
+        action: "DUPLICATE_BLOCKED",
+        targetType: "RESULT",
+        mrn,
+        specimenNo,
+        summary: "Duplicate specimen/MRN blocked within 3-month window",
+        source: "api",
+      });
+
 
       // const kfreResult = await calculateKfre(inputs);
       const kfreResult = await calculateKfre(inputs);
