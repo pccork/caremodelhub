@@ -105,12 +105,12 @@ export default function NewCalculation() {
         </div>
 
         <div className="column">
-          <label className="label">eGFR mL/min/1.73m²</label>
+          <label className="label"> eGFR <span className="is-size-7 has-text-grey">mL/min/1.73m²</span></label>
           <input className="input" type="number" value={form.inputs.egfr} onChange={set("inputs.egfr")} />
         </div>
 
         <div className="column">
-          <label className="label">ACR mg/mmol</label>
+          <label className="label">ACR <span className="is-size-7 has-text-grey">mg/mmol</span></label>
           <input className="input" type="number" value={form.inputs.acr} onChange={set("inputs.acr")} />
         </div>
       </div>
