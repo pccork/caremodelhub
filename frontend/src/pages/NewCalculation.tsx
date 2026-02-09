@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import api from "../api/api";
 
+const SPECIMEN_REGEX = /^BC\d{6}$/; // Specimen number must be starting with BC followed by 6 digits
+
+
 export default function NewCalculation() {
   const [form, setForm] = useState({
     mrn: "",
@@ -11,16 +14,32 @@ export default function NewCalculation() {
   const [result, setResult] = useState<any>(null);
   const [err, setErr] = useState<string | null>(null);
   const [ok, setOk] = useState<string | null>(null);
+  const [specimenErr, setSpecimenErr] = useState<string | null>(null); // Add a specimen error state
 
   const submit = async () => {
     setErr(null); setOk(null);
+    //Specimen number format check
+    if (!SPECIMEN_REGEX.test(form.specimenNo)) {
+      setErr("Specimen No must be BC followed by 6 digits (e.g. BC000123)");
+      return;
+    }
+
     try {
       const r = await api.post("/api/results", form);
       setResult(r.data);
       setOk("Calculation saved.");
+
+      //RESET FORM AFTER SUCCESS
+      setForm({
+        mrn: "",
+        specimenNo: "",
+        inputs: { age: 60, sex: "male", egfr: 35, acr: 120 },
+      });
+      setSpecimenErr(null);
     } catch (e: any) {
       setErr(e?.response?.data?.message || e?.response?.data?.error || "Calculation failed");
     }
+
   };
 
   const set = (path: string) => (e: any) => {
@@ -41,11 +60,31 @@ export default function NewCalculation() {
       <div className="columns">
         <div className="column">
           <label className="label">MRN</label>
-          <input className="input" value={form.mrn} onChange={set("mrn")} />
+          <input className="input" value={form.mrn} onChange={set("mrn")} placeholder="Patient MRN" />
         </div>
         <div className="column">
           <label className="label">Specimen No</label>
-          <input className="input" value={form.specimenNo} onChange={set("specimenNo")} />
+          <input //Auto-uppercases, enforces BC###### and with backend final control
+            className={`input ${specimenErr ? "is-danger" : ""}`}
+            value={form.specimenNo}
+            placeholder="BC000001"
+            maxLength={8}
+            pattern="^BC\d{6}$"
+            title="Specimen number must be BC followed by 6 digits (e.g. BC000123)"
+            onChange={(e) => {
+              const value = e.target.value.toUpperCase();
+              setForm((f) => ({ ...f, specimenNo: value }));
+
+              if (!SPECIMEN_REGEX.test(value)) {
+                setSpecimenErr("Specimen No must be BC followed by 6 digits");
+              } else {
+                setSpecimenErr(null);
+              }
+            }}
+          />
+          {specimenErr && (
+            <p className="help is-danger">{specimenErr}</p> // Bulma error styling  
+          )}
         </div>
       </div>
 
@@ -66,12 +105,12 @@ export default function NewCalculation() {
         </div>
 
         <div className="column">
-          <label className="label">eGFR</label>
+          <label className="label">eGFR mL/min/1.73m²</label>
           <input className="input" type="number" value={form.inputs.egfr} onChange={set("inputs.egfr")} />
         </div>
 
         <div className="column">
-          <label className="label">ACR</label>
+          <label className="label">ACR mg/mmol</label>
           <input className="input" type="number" value={form.inputs.acr} onChange={set("inputs.acr")} />
         </div>
       </div>
