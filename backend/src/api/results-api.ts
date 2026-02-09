@@ -62,10 +62,7 @@ export const resultsApi: {
       );
 
       if (recentExists) {
-        throw Boom.conflict(
-          "This MRN and specimen number has already been processed within the last 3 months"
-        );
-      }
+        
       
       // Create an audit trail when a duplicate is blocked
       await db.auditStore?.record({
@@ -78,6 +75,11 @@ export const resultsApi: {
         summary: "Duplicate specimen/MRN blocked within 3-month window",
         source: "api",
       });
+
+      throw Boom.conflict(
+          "This MRN and specimen number has already been processed within the last 3 months"
+        );
+      }
 
 
       // const kfreResult = await calculateKfre(inputs);
