@@ -16,11 +16,13 @@
 }
 
 /* 3. Typography for clinical readability */
+/*
 body {
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.5;
 }
+*/
 
 /* 4. Tables – denser clinical layout */
 .table td,
@@ -49,5 +51,11 @@ body {
 
 /* 6. Citrix / VDI scaling safety */
 html {
-  zoom: 2;
+  font-size: 16px;
+}
+
+@media screen and (min-width: 1600px) {
+  html {
+    font-size: 18px;
+  }
 }
