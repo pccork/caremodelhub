@@ -62,10 +62,27 @@ export const resultsApi: {
       );
 
       if (recentExists) {
+         try {
+            if (db.auditStore) {
+              await db.auditStore.record({
+                actorId: userId,
+                actorRole: role,
+                action: "DUPLICATE_BLOCKED",
+                targetType: "RESULT",
+                mrn,
+                specimenNo,
+                summary: "Duplicate specimen/MRN blocked within 3-month window",
+                source: "api",
+              });
+            }
+          } catch (auditErr) {
+            console.error("Audit logging failed:", auditErr);
+            // continue execution
+          }
         
       
       // Create an audit trail when a duplicate is blocked
-      await db.auditStore?.record({
+      /*await db.auditStore?.record({
         actorId: userId,
         actorRole: role,
         action: "DUPLICATE_BLOCKED",
@@ -74,10 +91,10 @@ export const resultsApi: {
         specimenNo,
         summary: "Duplicate specimen/MRN blocked within 3-month window",
         source: "api",
-      });
+      });*/
 
       throw Boom.conflict(
-          "This MRN and specimen number has already been processed within the last 3 months"
+          "A KFRE calculation for this MRN and specimen number has already been recorded within the past 3 months. Please review the existing result via the Dashboard."
         );
       }
 
@@ -164,6 +181,24 @@ export const resultsApi: {
       // ======================
       // AUDIT SEARCH INTENT
       // ======================
+      try {
+        if (db.auditStore) {
+          await db.auditStore.record({
+            actorId: userId,
+            actorRole: role,
+            action: "SEARCH_RESULTS",
+            targetType: "RESULT",
+            mrn,
+            specimenNo,
+            summary: "Clinical search of KFRE results",
+            source: "api",
+          });
+        }
+      } catch (auditErr) {
+        console.error("Audit logging failed (search):", auditErr);
+  // Do NOT block search results
+      }
+      /*this block made serch not work
       await db.auditStore?.record({
         actorId: userId,
         actorRole: role,
@@ -174,6 +209,7 @@ export const resultsApi: {
         summary: "Clinical search of KFRE results",
         source: "api",
       });
+      */
 
 
      } else {
