@@ -28,6 +28,7 @@ const auditSchema = new mongoose.Schema(
         "CALCULATE_RESULT",
         "RECALCULATE_RESULT",
         "DELETE_RESULT",
+        "SEARCH_RESULTS",  
         "LOGIN",
       ],
     },
