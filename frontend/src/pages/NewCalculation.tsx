@@ -121,8 +121,40 @@ export default function NewCalculation() {
 
       {result && (
         <div className="box mt-5">
-          <h2 className="title is-5">Saved Result</h2>
-          <pre style={{ whiteSpace: "pre-wrap" }}>{JSON.stringify(result, null, 2)}</pre>
+          <h2 className="title is-5">KFRE Result</h2>
+
+          {(() => {
+            const risk = result.outputs?.kfre?.risk_5y_percent;
+
+            if (risk === undefined) {
+              return <p>Risk not available</p>;
+            }
+
+            const colorClass =
+              risk >= 5 ? "has-text-danger" : "has-text-success";
+
+            return (
+              <>
+                <p>
+                  <strong>MRN:</strong> {result.mrn}
+                </p>
+
+                <p>
+                  <strong>Specimen No:</strong> {result.specimenNo}
+                </p>
+
+                <hr />
+
+                <p className={`title is-3 ${colorClass}`}>
+                  {risk.toFixed(2)}%
+                </p>
+
+                <p className="subtitle is-6">
+                  5-Year Kidney Failure Risk
+                </p>
+              </>
+            );
+          })()}
         </div>
       )}
     </div>
