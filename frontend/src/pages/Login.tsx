@@ -27,7 +27,21 @@ export default function Login() {
 
   return (
     <div className="section" style={{ maxWidth: 520, margin: "0 auto" }}>
-      <h1 className="title">CareModel Hub — Login</h1>
+      <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        <img
+          src={`${import.meta.env.BASE_URL}caremodel_hub_logo.png`}
+          alt="CareModel Hub logo"
+          style={{
+            width: "70%",
+            maxWidth: "360px",
+            height: "auto",
+            display: "block",
+            margin: "0 auto"
+          }}
+        />
+      </div>
+
+      <h1 className="title has-text-centered">CareModel Hub — Login</h1>
       {err && <div className="notification is-danger">{err}</div>}
 
       <div className="field">
