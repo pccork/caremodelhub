@@ -1,6 +1,6 @@
 """
 KFRE 4-variable equation (5-year risk)
-Calibrated to a non–North American population
+Calibrated to a non-North American population
 
 Risk = 1 - 0.9365 ^ exp(βsum)
 
@@ -21,7 +21,7 @@ MODEL_VERSION = "1.0.0-nonNA-calibrated"
 
 def calculate_kfre_5y(age: int, sex: str, egfr: float, acr: float) -> float:
     """
-    Returns 5-year ESRD risk percentage (0–100).
+    Returns 5-year ESRD risk percentage (0-100).
     """
     if sex not in ("male", "female"):
         raise ValueError("sex must be 'male' or 'female'")
