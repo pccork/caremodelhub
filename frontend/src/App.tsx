@@ -10,6 +10,7 @@ import Disclaimer from "./pages/Disclaimer";
 import { RequireAuth, RequireRole, RequireDisclaimer } from "./auth/Guards";
 import ModelSelect from "./pages/ModelsSelect";
 
+
 // routes for frontend
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
       <NavBar />
       <Routes>
         <Route path="/" element={<Navigate to="/models" replace />} />
+
 
         <Route path="/login" element={<Login />} />
 
