@@ -1,5 +1,10 @@
+import j2sModule from "joi-to-swagger";
+import { createResultSchema } from "../schemas/result.schema.js";
 import type { OpenAPIV3 } from "openapi-types";
+const j2s = (j2sModule as any).default ?? j2sModule;
 
+const conversion = j2s(createResultSchema);
+const resultRequestSchema = conversion.swagger;
 export const openApiSpec: OpenAPIV3.Document = {
   openapi: "3.0.0",
 
@@ -118,11 +123,29 @@ export const openApiSpec: OpenAPIV3.Document = {
         summary: "Create calculation result.  Requires role: user only. ",
         tags: ["results"],
         security: [{ bearerAuth: [] }],
-        responses: {
-          "201": { description: "Result created" },
-          "401": { description: "Unauthorized" },
-          "403": { description: "Valid JWT but insufficient role" }
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: resultRequestSchema as OpenAPIV3.SchemaObject
+            }
+          }
         },
+        responses: {
+          "201": {
+            description: "Result created",
+            content: {
+              "application/json": {
+                schema: {
+                  type: "object"
+                }
+              }
+            }
+          },
+          "400": { description: "Invalid payload" },
+          "401": { description: "Unauthorized" },
+          "403": { description: "Insufficient role" }
+        }
       },
 
       get: {

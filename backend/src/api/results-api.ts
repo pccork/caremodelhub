@@ -6,6 +6,7 @@ import { capabilities } from "../auth/capabilities.js";
 import { hasCapability } from "../auth/authorise.js";
 import { calculateKfre } from "../services/kfre-client.js";
 import crypto from "crypto";
+import { createResultSchema } from "../schemas/result.schema.js";
 
 export const resultsApi: {
   create: Pick<ServerRoute, "options" | "handler">;
@@ -19,29 +20,10 @@ export const resultsApi: {
     options: {
       auth: { scope: ["user"] },// only users reach handler
       validate: {
-        payload: Joi.object({
-          mrn: Joi.string()
-            .trim()
-            .max(32)
-            .required(),
-
-          specimenNo: Joi.string()
-            .pattern(/^BC\d{6}$/)
-            .required()
-            .messages({
-              "string.pattern.base":
-                "Specimen number must be in format BC###### (e.g. BC000123)",
-            }),
-
-          inputs: Joi.object({
-            age: Joi.number().integer().min(18).max(110).required(),
-            sex: Joi.string().valid("male", "female").required(),
-            egfr: Joi.number().min(1).max(200).required(),
-            acr: Joi.number().positive().required(),
-          }).required(),
-        }),
+        payload: createResultSchema,
       },
     },
+    
 
     handler: async (request: any, h: any) => {
       const { userId, role } = request.auth.credentials;
@@ -49,7 +31,6 @@ export const resultsApi: {
       if (!hasCapability(role, capabilities.RESULTS_CREATE)) {
         throw Boom.forbidden("Not allowed to create results");
       }
-
       const { mrn, specimenNo, inputs } = request.payload;
 
       /* ===============================
